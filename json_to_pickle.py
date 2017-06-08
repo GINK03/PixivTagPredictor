@@ -65,12 +65,13 @@ def illustid_vec():
   open("illustid_vec.pkl", "wb").write( pickle.dumps(illustid_vec) )
 
 """ tag -> { 
-  positive : [(userid), (userid), ...],
-  negative : [(userid), (userid), ...]
+  positive : {userid:vec, userid:vec, ...},
+  negative : {userid:vec, userid:vec, ...}
 } 
 """
 def tag_pair():
-  tag_pair = {}
+  illustid_vec = pickle.loads( open("illustid_vec.pkl", "rb").read() )
+
   illust_ids = set()
   for e, name in enumerate(glob.glob("../metas/*.json")):
     illust_id = re.search(r"/(illust_id.*?)\.json", name).group(1)
@@ -80,16 +81,34 @@ def tag_pair():
   for et, (tag, positives) in enumerate(tag_list.items()):
     if len(positives) < 600:
       continue
+    tag_pair = {}
     print(et, tag, len(positives) )
-    tag_pair[tag] = {}
-    tag_pair[tag]["positive"] = positives
+    
+    """ ちゃんとベクタペアがあるやつ """
+    pv = {}
+    for p in positives:
+      if illustid_vec.get(p) is None:
+        continue
+      pv[p] = illustid_vec[p]
+
+    tag_pair["positive"] = pv
     """ negativeのサンプリング　"""
     negative_lot = illust_ids - positives
     negative_lot = list(negative_lot) 
     random.shuffle(negative_lot)
+    
+    nv = {}
+    for n in negative_lot:
+      if illustid_vec.get(n) is None:
+        continue
+      nv[n] = illustid_vec[n]
+      if len(nv) >= len(pv)*5:
+        break
+      
     """ negativeはpositiveの５倍取る """
-    negatives   = negative_lot[:len(positives) * 5]
-    tag_pair[tag]["negative"] = negatives
+    tag_pair["negative"] = nv
+    open("tag_pair/{}.pkl".format(tag.replace("/", "_")), "wb").write( pickle.dumps(tag_pair) )
+    
 
 if __name__ == '__main__':
   if '--count' in sys.argv:
