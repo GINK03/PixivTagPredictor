@@ -45,6 +45,25 @@ def tag_list():
       tag_list[tag].add( illust_id )
   open("tag_list.pkl", "wb").write( pickle.dumps(tag_list) )
 
+
+"""
+{ 
+  userid -> vec,
+  userid -> vec,
+  ...
+}
+"""
+def illustid_vec():
+  illustid_vec = {}
+  for ei, name in enumerate(glob.glob("/home/gimpei/19/sdb/keras-tiny-vae/vectors/*.json")):
+    v        = json.loads(open(name, "r").read()) 
+    illustid = re.search(r"(illust.*?)\.json", name).group(1)
+    if ei%500 == 0:
+      print(ei, illustid, v[:2])
+    if illustid_vec.get(illustid) is None:
+      illustid_vec[illustid] = v
+  open("illustid_vec.pkl", "wb").write( pickle.dumps(illustid_vec) )
+
 """ tag -> { 
   positive : [(userid), (userid), ...],
   negative : [(userid), (userid), ...]
@@ -79,6 +98,9 @@ if __name__ == '__main__':
     check()
   if '--tag_list' in sys.argv:
     tag_list()
-  
+ 
+  if '--illustid_vec' in sys.argv:
+    illustid_vec()
+
   if '--tag_pair' in sys.argv:
     tag_pair()
