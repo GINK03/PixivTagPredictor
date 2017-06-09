@@ -55,7 +55,7 @@ def tag_list():
 """
 def illustid_vec():
   illustid_vec = {}
-  for ei, name in enumerate(glob.glob("/home/gimpei/19/sdb/keras-tiny-vae/vectors/*.json")):
+  for ei, name in enumerate(glob.glob("/home/gimpei/vectors/*.json")):
     v        = json.loads(open(name, "r").read()) 
     illustid = re.search(r"(illust.*?)\.json", name).group(1)
     if ei%500 == 0:
@@ -74,6 +74,8 @@ def tag_pair():
 
   illust_ids = set()
   for e, name in enumerate(glob.glob("../metas/*.json")):
+    if e%50 == 0:
+      print("now loading iter", e)
     illust_id = re.search(r"/(illust_id.*?)\.json", name).group(1)
     illust_ids.add( illust_id )
 
@@ -102,12 +104,12 @@ def tag_pair():
       if illustid_vec.get(n) is None:
         continue
       nv[n] = illustid_vec[n]
-      if len(nv) >= len(pv)*5:
+      if len(nv) >= len(pv)*10:
         break
       
-    """ negativeはpositiveの５倍取る """
+    """ negativeはpositiveの10倍取る """
     tag_pair["negative"] = nv
-    open("tag_pair/{}.pkl".format(tag.replace("/", "_")), "wb").write( pickle.dumps(tag_pair) )
+    open("/home/gimpei/sda/tag_pair/{}.pkl".format(tag.replace("/", "_")), "wb").write( pickle.dumps(tag_pair) )
     
 
 if __name__ == '__main__':

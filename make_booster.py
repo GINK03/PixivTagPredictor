@@ -14,7 +14,7 @@ def to_svm(arr):
 
 
 def train():
-  for name in glob.glob("tag_pair/*.pkl"):
+  for name in glob.glob("/home/gimpei/sda/tag_pair/*.pkl"):
     try:
       pair = pickle.loads( open(name, "rb").read() )
     except EOFError as e:
@@ -30,7 +30,8 @@ def train():
     random.shuffle(ts)
 
     tl = len(ts)
-    term = re.search(r"/(.*?)\.pkl", name).group(1)
+    term = re.search(r"(.*?)\.pkl", name.split("/").pop()).group(1)
+    print(term)
     dtrain  = "\n".join( ts[:int(tl*0.8)] )
     dtest   = "\n".join( ts[int(tl*0.8):] )
     open("booster_data/{}.train.txt".format(term), "w").write( dtrain )  
