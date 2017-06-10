@@ -8,6 +8,8 @@ import glob
 import re
 
 import xgboost as xgb
+import os.path
+
 
 def to_svm(arr):
   return " ".join([ "%d:%09f"%(e,a) for e, a in enumerate(arr) ])
@@ -15,6 +17,14 @@ def to_svm(arr):
 
 def train():
   for name in glob.glob("/home/gimpei/sda/tag_pair/*.pkl"):
+    """ すでにやったやつは飛ばす """ 
+    term = re.search(r"(.*?)\.pkl", name.split("/").pop()).group(1)
+    save_name = "booster_models/{}.model".format(term)
+    if os.path.isfile(save_name):
+      print("already proceeded", term)
+      continue
+    print("deal to", term)
+
     try:
       pair = pickle.loads( open(name, "rb").read() )
     except EOFError as e:
@@ -30,7 +40,6 @@ def train():
     random.shuffle(ts)
 
     tl = len(ts)
-    term = re.search(r"(.*?)\.pkl", name.split("/").pop()).group(1)
     print(term)
     dtrain  = "\n".join( ts[:int(tl*0.8)] )
     dtest   = "\n".join( ts[int(tl*0.8):] )
@@ -39,7 +48,6 @@ def train():
     print(term, len(ts) )
 
     """ train & save models """
-    save_name = "booster_models/{}.model".format(term)
     dtrain    = xgb.DMatrix( "booster_data/{}.train.txt".format(term) )
     dtest     = xgb.DMatrix( "booster_data/{}.test.txt".format(term) )
     param     = {'max_depth':1000, 'eta':0.025, 'silent':1, 'objective':'binary:logistic' }
