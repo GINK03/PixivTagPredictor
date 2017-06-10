@@ -47,7 +47,7 @@ def train():
     dtrain  = "\n".join( ts[:int(tl*0.8)] )
     dtest   = "\n".join( ts[int(tl*0.8):] )
     open("booster_data/{}.train.txt".format(term), "w").write( dtrain )  
-    open("booster_data/{}.test.txt".format(term), "w").write( dtrain )  
+    open("booster_data/{}.test.txt".format(term), "w").write( dtest )  
     print(term, len(ts) )
 
     """ train & save models """
