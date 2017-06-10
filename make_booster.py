@@ -17,7 +17,9 @@ def to_svm(arr):
 PATH = "/home/gimpei/6/sda/tag_pair/*.pkl"
 
 def train():
-  for name in glob.glob(PATH):
+  files = glob.glob(PATH)
+  random.shuffle( files ) 
+  for name in files:
     """ すでにやったやつは飛ばす """ 
     term = re.search(r"(.*?)\.pkl", name.split("/").pop()).group(1)
     save_name = "booster_models/{}.model".format(term)
