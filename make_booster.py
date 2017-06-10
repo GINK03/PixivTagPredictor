@@ -26,6 +26,10 @@ def train():
     if os.path.isfile(save_name):
       print("already proceeded", term)
       continue
+
+    """ 今回は艦これ以外やらない """
+    #if "艦隊これくしょん" not in term and "艦これ" not in term:
+    #  continue
     print("deal to", term)
 
     try:
@@ -43,6 +47,10 @@ def train():
     random.shuffle(ts)
 
     tl = len(ts)
+    # 50000より大きいのは見ない
+    if tl > 50000: 
+      print(tl, "skipします")
+      continue
     print(term)
     dtrain  = "\n".join( ts[:int(tl*0.8)] )
     dtest   = "\n".join( ts[int(tl*0.8):] )
@@ -58,8 +66,8 @@ def train():
       num_round = 300
       evallist  = [(dtest,'eval'), (dtrain,'train')]
       bst       = xgb.train( param, dtrain, num_round, evallist )
-      bst.dump_model(save_name)
-    except xgboost.core.XGBoostError as e:
+      bst.save_model(save_name)
+    except xgb.core.XGBoostError as e:
       print(e)
       continue
 
