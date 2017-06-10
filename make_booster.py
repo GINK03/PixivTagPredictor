@@ -14,7 +14,7 @@ import os.path
 def to_svm(arr):
   return " ".join([ "%d:%09f"%(e,a) for e, a in enumerate(arr) ])
 
-PATH = "/home/gimpei/6/sda/tag_pair/*.pkl"
+PATH = "/home/gimpei/{}/sda/tag_pair/*.pkl".format( "6" )
 
 def train():
   files = glob.glob(PATH)
@@ -51,13 +51,17 @@ def train():
     print(term, len(ts) )
 
     """ train & save models """
-    dtrain    = xgb.DMatrix( "booster_data/{}.train.txt".format(term) )
-    dtest     = xgb.DMatrix( "booster_data/{}.test.txt".format(term) )
-    param     = {'max_depth':1000, 'eta':0.025, 'silent':1, 'objective':'binary:logistic' }
-    num_round = 300
-    evallist  = [(dtest,'eval'), (dtrain,'train')]
-    bst       = xgb.train( param, dtrain, num_round, evallist )
-    bst.dump_model(save_name)
+    try:
+      dtrain    = xgb.DMatrix( "booster_data/{}.train.txt".format(term) )
+      dtest     = xgb.DMatrix( "booster_data/{}.test.txt".format(term) )
+      param     = {'max_depth':1000, 'eta':0.025, 'silent':1, 'objective':'binary:logistic' }
+      num_round = 300
+      evallist  = [(dtest,'eval'), (dtrain,'train')]
+      bst       = xgb.train( param, dtrain, num_round, evallist )
+      bst.dump_model(save_name)
+    except xgboost.core.XGBoostError as e:
+      print(e)
+      continue
 
     for ps in bst.predict(dtest):
       print(ps)
