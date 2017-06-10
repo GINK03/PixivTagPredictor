@@ -14,9 +14,10 @@ import os.path
 def to_svm(arr):
   return " ".join([ "%d:%09f"%(e,a) for e, a in enumerate(arr) ])
 
+PATH = "/home/gimpei/6/sda/tag_pair/*.pkl"
 
 def train():
-  for name in glob.glob("/home/gimpei/sda/tag_pair/*.pkl"):
+  for name in glob.glob(PATH):
     """ すでにやったやつは飛ばす """ 
     term = re.search(r"(.*?)\.pkl", name.split("/").pop()).group(1)
     save_name = "booster_models/{}.model".format(term)
